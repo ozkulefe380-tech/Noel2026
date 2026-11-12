@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notre Calendrier de l'Avent ❤️🎄</title>
+    <!-- Chargement de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Polices Google Fonts élégantes et romantiques -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        script: ['"Great Vibes"', 'cursive'],
+                    },
+                    colors: {
+                        roseNoel: {
+                            50: '#fff1f3',
+                            100: '#ffe4e8',
+                            200: '#fecdd6',
+                            300: '#fda4b4',
+                            400: '#fb718c',
+                            500: '#f43f64',
+                            600: '#e11d48',
+                            700: '#be123c',
+                            800: '#9f1239',
+                            900: '#881337',
+                            950: '#4c0519',
+                        },
+                        orDoux: '#f5d08a',
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'pop': 'pop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-8px)' },
+                        },
+                        pop: {
+                            '0%': { transform: 'scale(0.85)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Dégradé de fond chaleureux rouge bordeaux et rose romantique */
+        body {
+            background: radial-gradient(circle at top center, #881337 0%, #4c0519 55%, #2a020d 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Effet verre dépoli (Glassmorphism) */
+        .glass-card {
+            background: rgba(255, 241, 243, 0.08);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(253, 164, 180, 0.22);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .glass-card-opened {
+            background: linear-gradient(135deg, rgba(244, 63, 100, 0.25), rgba(253, 164, 180, 0.15));
+            border: 1px solid rgba(245, 208, 138, 0.5);
+        }
+
+        .glass-modal {
+            background: linear-gradient(160deg, #fff5f7 0%, #ffe4e9 100%);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Effet brillance dorée sur les bordures au survol */
+        .door-hover:hover {
+            transform: translateY(-4px) scale(1.02);
+            border-color: #f5d08a;
+            box-shadow: 0 12px 25px -5px rgba(244, 63, 100, 0.4), 0 0 15px rgba(245, 208, 138, 0.3);
+        }
+
+        /* Cartes du jeu Memory */
+        .memory-card {
+            perspective: 1000px;
+        }
+        .memory-inner {
+            transition: transform 0.5s;
+            transform-style: preserve-3d;
+        }
+        .memory-flipped .memory-inner {
+            transform: rotateY(180deg);
+        }
+        .memory-front, .memory-back {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .memory-back {
+            transform: rotateY(180deg);
+        }
+
+        /* Canvas d'arrière-plan pour la neige et les cœurs */
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body class="text-roseNoel-50 antialiased selection:bg-roseNoel-500 selection:text-white">
+
+    <!-- Arrière-plan animé (flocons & petits cœurs) -->
+    <canvas id="particles-canvas"></canvas>
+
+    <!-- Conteneur principal -->
+    <div class="relative z-10 max-w-5xl mx-auto px-4 py-8 sm:py-12 flex flex-col min-h-screen">
+        
+        <!-- En-tête personnalisable -->
+        <header class="text-center mb-8 sm:mb-12 animate-float">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-roseNoel-900/60 border border-roseNoel-400/30 text-roseNoel-200 text-xs sm:text-sm font-medium mb-4 shadow-sm">
+                <span>✨un noel pas très loin de toi ✨</span>
+            </div>
+            
+            <!-- MODIFIE LE TITRE ET LE SOUS-TITRE ICI SI TU LE SOUHAITES -->
+            <h1 id="app-title" class="font-script text-5xl sm:text-7xl text-transparent bg-clip-text bg-gradient-to-r from-roseNoel-100 via-orDoux to-roseNoel-200 drop-shadow-sm py-2">
+                24 Jours de suprise rien que pour toi
+            </h1>
+            <p id="app-subtitle" class="mt-2 text-roseNoel-200/90 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
+                Chaque jour jusqu'à Noël, ouvre une nouvelle case pour découvrir un petit mot doux, un souvenir ou un mini-jeu préparé pour toi hihi ❤️
+            </p>
+
+            <!-- Barre de progression -->
+            <div class="mt-6 max-w-xs mx-auto">
+                <div class="flex justify-between text-xs text-roseNoel-200/80 mb-1.5 font-medium">
+                    <span>Surprises découvertes</span>
+                    <span id="progress-text">0 / 24</span>
+                </div>
+                <div class="w-full h-2.5 bg-roseNoel-950/80 rounded-full overflow-hidden border border-roseNoel-400/20 p-0.5">
+                    <div id="progress-bar" class="h-full bg-gradient-to-r from-roseNoel-500 via-roseNoel-400 to-orDoux rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Bandeau d'alerte si le Mode Aperçu est activé -->
+        <div id="preview-banner" class="hidden mb-6 mx-auto max-w-lg w-full bg-amber-500/20 border border-amber-300/50 text-amber-100 px-4 py-2.5 rounded-2xl text-xs sm:text-sm flex items-center justify-between gap-3 backdrop-blur-md">
+            <div class="flex items-center gap-2">
+                <span class="text-base">🔓</span>
+                <span><strong>Mode Aperçu actif :</strong> Toutes les cases sont déverrouillées pour tes tests.</span>
+            </div>
+            <button onclick="togglePreviewMode()" class="underline font-semibold hover:text-white shrink-0">Quitter</button>
+        </div>
+
+        <!-- Grille des 24 cases du calendrier -->
+        <main class="flex-grow">
+            <div id="calendar-grid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3 sm:gap-4">
+                <!-- Les 24 cases seront générées ici automatiquement par JavaScript -->
+            </div>
+        </main>
+
+        <!-- Pied de page avec contrôles discrets -->
+        <footer class="mt-12 pt-6 border-t border-roseNoel-400/15 text-center text-xs text-roseNoel-300/70 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p>Fait avec tout mon amour pour toi ❤️🎄</p>
+            
+            <div class="flex items-center gap-3">
+                <button id="preview-toggle-btn" onclick="togglePreviewMode()" class="px-3 py-1.5 rounded-xl bg-roseNoel-900/50 hover:bg-roseNoel-800/70 border border-roseNoel-400/20 text-roseNoel-200 transition cursor-pointer">
+                    🔓 Mode Aperçu (Tout débloquer)
+                </button>
+                <button onclick="askResetProgress()" class="px-3 py-1.5 rounded-xl bg-roseNoel-950/50 hover:bg-roseNoel-900/70 border border-roseNoel-400/10 text-roseNoel-300/70 hover:text-roseNoel-200 transition cursor-pointer">
+                    Réinitialiser
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Notification Toast (remplace alert() pour les messages doux) -->
+    <div id="toast-notification" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 transition-all duration-300 transform translate-y-4 w-[90%] max-w-md">
+        <div class="bg-roseNoel-900/95 border border-orDoux/50 text-roseNoel-50 px-5 py-3.5 rounded-2xl shadow-2xl backdrop-blur-md flex items-center gap-3">
+            <span id="toast-icon" class="text-2xl">💌</span>
+            <p id="toast-message" class="text-sm font-medium leading-snug"></p>
+        </div>
+    </div>
+
+    <!-- Modale de confirmation personnalisée (pour réinitialiser sans confirm()) -->
+    <div id="confirm-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+        <div class="glass-modal text-roseNoel-950 rounded-3xl max-w-sm w-full p-6 text-center animate-pop border border-roseNoel-200">
+            <div class="text-4xl mb-3">🔄</div>
+            <h3 class="text-lg font-bold text-roseNoel-900 mb-2">Refermer toutes les cases ?</h3>
+            <p class="text-sm text-roseNoel-800/80 mb-6">Cela remettra à zéro les cases déjà ouvertes et les bons validés sur cet appareil.</p>
+            <div class="flex gap-3 justify-center">
+                <button onclick="closeConfirmModal()" class="flex-1 py-2.5 px-4 rounded-xl bg-roseNoel-200/70 hover:bg-roseNoel-200 text-roseNoel-900 font-semibold text-sm transition cursor-pointer">
+                    Annuler
+                </button>
+                <button onclick="confirmResetProgress()" class="flex-1 py-2.5 px-4 rounded-xl bg-roseNoel-600 hover:bg-roseNoel-700 text-white font-semibold text-sm shadow-md transition cursor-pointer">
+                    Oui, refermer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modale principale pour afficher le contenu du jour -->
+    <div id="day-modal" class="fixed inset-0 z-40 hidden items-center justify-center p-3 sm:p-6 bg-black/75 backdrop-blur-sm overflow-y-auto">
+        <div class="glass-modal text-roseNoel-950 rounded-3xl max-w-lg w-full p-6 sm:p-8 relative animate-pop border-2 border-orDoux/60 my-auto">
+            
+            <!-- Bouton Fermer -->
+            <button onclick="closeDayModal()" aria-label="Fermer" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-roseNoel-200/70 hover:bg-roseNoel-300 text-roseNoel-900 flex items-center justify-center font-bold transition cursor-pointer">
+                ✕
+            </button>
+
+            <!-- En-tête de la modale -->
+            <div class="text-center mb-5">
+                <span id="modal-day-badge" class="inline-block px-3.5 py-1 rounded-full bg-roseNoel-600 text-white text-xs font-bold tracking-wider uppercase shadow-sm mb-2">
+                    1er Décembre
+                </span>
+                <div id="modal-emoji" class="text-4xl sm:text-5xl my-2">💌</div>
+                <h2 id="modal-title" class="text-2xl sm:text-3xl font-bold text-roseNoel-900 leading-tight">
+                    Titre de la surprise
+                </h2>
+            </div>
+
+            <!-- Contenu dynamique (Message, Quiz, Memory, Bon cadeau, Devinette) -->
+            <div id="modal-body" class="text-roseNoel-900">
+                <!-- Injecté dynamiquement par JavaScript -->
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        /* ============================================================================
+           🎁 ZONE DE PERSONNALISATION (MODIFIE TES 24 SURPRISES ICI !)
+           ============================================================================
+           Chaque objet représente un jour du 1er au 24 décembre.
+           Tu as 5 types de surprises disponibles :
+           
+           1. type: "message"  -> Un mot doux, une déclaration ou un souvenir.
+              Champs : day, title, emoji, text, buttonText
+           
+           2. type: "quiz"     -> Une question à choix multiples sur vous deux.
+              Champs : day, title, emoji, question, options (tableau de choix),
+                       correctIndex (0 = 1er choix, 1 = 2e choix, etc.), explanation
+           
+           3. type: "memory"   -> Un mini-jeu de paires (Memory) spécial Noël & Amour.
+              Champs : day, title, emoji, intro, pairs (liste de 6 emojis), winMessage
+           
+           4. type: "coupon"   -> Un "Bon pour..." romantique qu'elle peut valider !
+              Champs : day, title, emoji, couponTitle, couponDesc, validity
+           
+           5. type: "riddle"   -> Une devinette ou charade avec bouton pour révéler la réponse.
+              Champs : day, title, emoji, question, hint, answer
+        ============================================================================ */
+
+        const calendarData = [
+            {
+                day: 1,
+                type: "message",
+                emoji: "🎄",
+                title: "Le début de notre magie",
+                text: "Coucou mon amour ! Nous sommes le 1er décembre, et j'avais envie de rendre cette attente jusqu'à Noël encore plus douce. Chaque jour jusqu'au 24, une petite surprise t'attend ici. Merci d'illuminer ma vie comme les guirlandes illuminent le sapin. Je t'aime fort ! ❤️",
+                buttonText: "J'ai hâte de découvrir la suite ❤️"
+            },
+            {
+                day: 2,
+                type: "quiz",
+                emoji: "💑",
+                title: "Petit Quiz : Nous deux",
+                question: "Quel est mon moment préféré quand je suis avec toi ?",
+                options: [
+                    "Quand on rigole pour n'importe quoi",
+                    "Quand on se blottit sous un plaid devant un film",
+                    "Quand on mange un bon petit plat ensemble",
+                    "Absolument tous les moments à tes côtés !"
+                ],
+                correctIndex: 3,
+                explanation: "Évidemment, c'était un piège : chaque seconde passée avec toi est mon moment préféré ! 🥰"
+            },
+            {
+                day: 3,
+                type: "coupon",
+                emoji: "💆‍♀️",
+                title: "Un moment rien que pour toi",
+                couponTitle: "BON POUR UN MASSAGE DE 30 MINUTES",
+                couponDesc: "Valable à tout moment sur simple demande (avec huile chaude et musique douce en option).",
+                validity: "Utilisable quand tu veux, sans date d'expiration ✨"
+            },
+            {
+                day: 4,
+                type: "memory",
+                emoji: "🃏",
+                title: "Mini-Jeu : Memory de Noël",
+                intro: "Retrouve toutes les paires d'amour et de Noël pour débloquer ton petit mot du jour !",
+                pairs: ["❤️", "🎄", "🎁", "❄️", "🥂", "🧸"],
+                winMessage: "Bravo championne ! Tu as une mémoire incroyable (surtout pour te souvenir que je t'aime à la folie) 😘"
+            },
+            {
+                day: 5,
+                type: "message",
+                emoji: "✨",
+                title: "3 choses que j'adore chez toi",
+                text: "1. Ton sourire qui me fait fondre instantanément.\n2. Ta gentillesse et ta façon de prendre soin des gens que tu aimes.\n3. La façon dont tu me regardes quand tu es heureuse.\n\nTu es ma plus belle étoile.",
+                buttonText: "Trop mignon ❤️"
+            },
+            {
+                day: 6,
+                type: "riddle",
+                emoji: "🕵️‍♀️",
+                title: "Petite devinette du jour",
+                question: "Je suis froid dehors, mais je réchauffe les cœurs quand on me regarde tomber par la fenêtre main dans la main. Qui suis-je ?",
+                hint: "Je suis blanc et je tombe en hiver...",
+                answer: "La neige ! ❄️ (Et promis, on ira se balader ensemble dès qu'elle tombera !)"
+            },
+            {
+                day: 7,
+                type: "coupon",
+                emoji: "🍫",
+                title: "Douceur d'hiver",
+                couponTitle: "BON POUR UN CHOCOLAT CHAUD & SOIRÉE FILM",
+                couponDesc: "Tu choisis le film de Noël (même le plus cliché !), je m'occupe du plaid, des chocolats chauds et des gourmandises.",
+                validity: "Valable dès ce soir si tu veux ! 🎬"
+            },
+            {
+                day: 8,
+                type: "quiz",
+                emoji: "🎶",
+                title: "Test de complicité",
+                question: "Si notre couple était une ambiance de Noël, ce serait plutôt :",
+                options: [
+                    "Chocolat chaud au coin du feu sous la neige",
+                    "Bataille de boules de neige et fous rires",
+                    "Balade main dans la main sous les illuminations",
+                    "Un mélange parfait des trois !"
+                ],
+                correctIndex: 3,
+                explanation: "Un mélange parfait de tendresse, de magie et de fous rires avec toi ! 🎄❤️"
+            },
+            {
+                day: 9,
+                type: "message",
+                emoji: "💌",
+                title: "Juste pour te le rappeler",
+                text: "Si jamais ta journée a été longue ou fatigante aujourd'hui, respire un grand coup et souviens-toi que je suis toujours là pour toi, quoi qu'il arrive. Tu es forte, belle et merveilleuse.",
+                buttonText: "Merci mon cœur 🥰"
+            },
+            {
+                day: 10,
+                type: "memory",
+                emoji: "🧸",
+                title: "Memory Gourmand & Festif",
+                intro: "Associe les symboles de notre hiver ensemble !",
+                pairs: ["🌹", "🍫", "🕯️", "🎶", "🧣", "💖"],
+                winMessage: "Gagné ! Tu mérites un énorme câlin dès qu'on se voit 🤗❤️"
+            },
+            {
+                day: 11,
+                type: "coupon",
+                emoji: "🥐",
+                title: "Réveil en douceur",
+                couponTitle: "BON POUR UN PETIT-DÉJEUNER AU LIT",
+                couponDesc: "Croissants chauds, jus d'orange pressé, café ou thé... Tu n'as qu'à rester sous la couette.",
+                validity: "Valable le week-end de ton choix ☀️"
+            },
+            {
+                day: 12,
+                type: "message",
+                emoji: "🌟",
+                title: "Déjà la moitié du chemin !",
+                text: "On est déjà le 12 décembre ! Plus que 12 petits jours avant Noël, et pourtant j'ai déjà l'impression d'avoir reçu le plus beau des cadeaux en t'ayant dans ma vie.",
+                buttonText: "Je t'aime ❤️"
+            },
+            {
+                day: 13,
+                type: "riddle",
+                emoji: "🎁",
+                title: "Énigme romantique",
+                question: "Plus je grandis avec le temps, plus je deviens précieux. On ne peut pas m'emballer dans du papier cadeau, mais je suis le plus beau présent à offrir. Qui suis-je ?",
+                hint: "Il bat très fort quand je te regarde...",
+                answer: "Notre amour ! ❤️ (C'est cliché, mais c'est tellement vrai !)"
+            },
+            {
+                day: 14,
+                type: "coupon",
+                emoji: "🍝",
+                title: "Soirée Gastronomique",
+                couponTitle: "BON POUR UN DÎNER AUX CHANDELLES",
+                couponDesc: "Je cuisine ton plat préféré (ou on commande dans ton resto favori) avec ambiance romantique garantie.",
+                validity: "À réserver quand tu en as envie 🕯️"
+            },
+            {
+                day: 15,
+                type: "quiz",
+                emoji: "❄️",
+                title: "Quiz : Qui est le plus...",
+                question: "Entre nous deux, qui est le plus susceptible de voler toute la couette pendant la nuit ?",
+                options: [
+                    "Toi, sans aucun doute !",
+                    "Moi (j'avoue un petit peu...)",
+                    "On fait match nul",
+                    "C'est la faute du froid hivernal"
+                ],
+                correctIndex: 0,
+                explanation: "Avoue-le avec le sourire... mais je te la laisse volontiers parce que tu es trop mignonne quand tu dors ! 😴❤️"
+            },
+            {
+                day: 16,
+                type: "message",
+                emoji: "🌹",
+                title: "Mon vœu le plus cher",
+                text: "Si je croisais le Père Noël aujourd'hui, je ne lui demanderais rien de matériel. Je lui demanderais juste de continuer à vivre des milliers de moments heureux à tes côtés.",
+                buttonText: "C'est trop doux 💖"
+            },
+            {
+                day: 17,
+                type: "memory",
+                emoji: "✨",
+                title: "Memory des Étoiles",
+                intro: "Trouve toutes les paires étoilées pour lire la suite !",
+                pairs: ["⭐", "🌙", "🥂", "💍", "🎀", "💘"],
+                winMessage: "Tu brilles plus fort que toutes les étoiles réunies ! ✨"
+            },
+            {
+                day: 18,
+                type: "coupon",
+                emoji: "🎟️",
+                title: "Joker spécial",
+                couponTitle: "BON POUR UN « JOKER CORVÉE »",
+                couponDesc: "Vaisselle, ménage, courses ou une tâche que tu n'as pas envie de faire : je m'en occupe à ta place avec le sourire !",
+                validity: "Utilisable à tout moment 🦸‍♂️"
+            },
+            {
+                day: 19,
+                type: "message",
+                emoji: "🧣",
+                title: "Toi & Moi contre le froid",
+                text: "Peu importe à quel point il fait froid dehors en décembre, il me suffit de penser à toi ou de te prendre dans mes bras pour avoir immédiatement chaud au cœur.",
+                buttonText: "Gros câlin ❤️"
+            },
+            {
+                day: 20,
+                type: "riddle",
+                emoji: "🕯️",
+                title: "Devine la suite...",
+                question: "Complète cette phrase : « Tout ce que je veux pour Noël, c'est... »",
+                hint: "All I want for Christmas is...",
+                answer: "...TOI ! (Et promis, je ne vais pas chanter Mariah Carey trop fort... quoique 🎤🎶)"
+            },
+            {
+                day: 21,
+                type: "coupon",
+                emoji: "📸",
+                title: "Souvenirs à créer",
+                couponTitle: "BON POUR UNE SORTIE EN AMOUREUX",
+                couponDesc: "Marché de Noël, patinoire, cinéma ou balade nocturne : une sortie 100% dédiée à nous deux.",
+                validity: "Valable très vite ! 🎄"
+            },
+            {
+                day: 22,
+                type: "quiz",
+                emoji: "💝",
+                title: "Avant-avant-dernier jour !",
+                question: "À combien de pourcents est-ce que je t'aime ?",
+                options: [
+                    "100%",
+                    "1 000%",
+                    "1 000 000%",
+                    "À l'infini et au-delà 🚀❤️"
+                ],
+                correctIndex: 3,
+                explanation: "Et même encore plus que ça ! Chaque jour un peu plus fort."
+            },
+            {
+                day: 23,
+                type: "message",
+                emoji: "🎅",
+                title: "Demain, c'est le grand jour !",
+                text: "Plus qu'un seul dodo avant le réveillon de Noël ! J'espère que ces 23 premières petites cases t'ont donné le sourire chaque matin. Prépare-toi pour la 24e demain...",
+                buttonText: "Vivements demain ! ✨"
+            },
+            {
+                day: 24,
+                type: "message",
+                emoji: "🎄❤️",
+                title: "Joyeux Noël mon Amour !",
+                text: "Nous y sommes ! Joyeux Noël ma chérie ❤️\n\nMerci d'être la personne extraordinaire que tu es. Ce calendrier touche à sa fin, mais notre histoire continue de s'écrire chaque jour. Je t'aime plus que tout au monde.\n\n(Et maintenant, viens me faire un énorme bisou pour recevoir ton vrai cadeau ! 🎁😘)",
+                buttonText: "Joyeux Noël mon cœur ❤️🎄"
+            }
+        ];
+
+        /* ============================================================================
+           ⚙️ LOGIQUE DE L'APPLICATION (Ne nécessite pas de modification)
+           ============================================================================ */
+
+        const STORAGE_KEY = 'romantic_advent_opened_days_v1';
+        const COUPONS_KEY = 'romantic_advent_redeemed_coupons_v1';
+        
+        let openedDays = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        let redeemedCoupons = JSON.parse(localStorage.getItem(COUPONS_KEY)) || [];
+        let previewMode = false;
+
+        // Icônes décoratives selon le type de case
+        const typeIcons = {
+            message: "💌",
+            quiz: "❓",
+            memory: "🎮",
+            coupon: "🎟️",
+            riddle: "✨"
+        };
+
+        // Initialisation au chargement de la page
+        document.addEventListener('DOMContentLoaded', () => {
+            initParticles();
+            renderCalendar();
+            updateProgress();
+        });
+
+        // Vérifie si un jour donné est débloqué selon la date réelle (ou le mode aperçu)
+        function isDayUnlocked(dayNumber) {
+            if (previewMode) return true;
+
+            const now = new Date();
+            const month = now.getMonth(); // 0 = Janvier, 10 = Novembre, 11 = Décembre
+            const date = now.getDate();
+
+            // En décembre (mois 11), débloque jusqu'au jour actuel
+            if (month === 11) {
+                return date >= dayNumber;
+            }
+            
+            // Avant décembre (ex: novembre), tout est verrouillé par défaut
+            return false;
+        }
+
+        // Génère la grille des 24 cases
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+
+            calendarData.forEach((item) => {
+                const unlocked = isDayUnlocked(item.day);
+                const isOpened = openedDays.includes(item.day);
+
+                const card = document.createElement('button');
+                card.type = 'button';
+                card.onclick = () => handleDayClick(item);
+
+                // Style dynamique selon l'état (ouverte, débloquée, ou verrouillée)
+                let baseClasses = "relative group rounded-2xl p-4 sm:p-5 flex flex-col items-center justify-between aspect-square transition-all duration-300 cursor-pointer overflow-hidden ";
+                
+                if (isOpened) {
+                    baseClasses += "glass-card glass-card-opened door-hover";
+                } else if (unlocked) {
+                    baseClasses += "glass-card door-hover border-roseNoel-300/40";
+                } else {
+                    baseClasses += "bg-roseNoel-950/60 border border-roseNoel-400/15 opacity-80 hover:opacity-95";
+                }
+
+                card.className = baseClasses;
+
+                // Contenu visuel de la case
+                const statusBadge = isOpened 
+                    ? `<span class="text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded-full bg-orDoux/20 text-orDoux border border-orDoux/40">Ouvert ✓</span>`
+                    : unlocked 
+                        ? `<span class="text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded-full bg-roseNoel-500/40 text-roseNoel-100 border border-roseNoel-300/40 animate-pulse-slow">À ouvrir ✨</span>`
+                        : `<span class="text-xs text-roseNoel-300/50">🔒</span>`;
+
+                const centerIcon = isOpened 
+                    ? item.emoji 
+                    : unlocked 
+                        ? (typeIcons[item.type] || "🎁")
+                        : "❄️";
+
+                card.innerHTML = `
+                    <!-- Effet de lueur subtile en arrière-plan -->
+                    <div class="absolute -top-6 -right-6 w-16 h-16 bg-roseNoel-400/10 rounded-full blur-xl group-hover:bg-orDoux/20 transition"></div>
+                    
+                    <div class="w-full flex justify-between items-center">
+                        <span class="font-bold text-lg sm:text-xl ${isOpened ? 'text-orDoux' : 'text-roseNoel-100'}">${item.day}</span>
+                        ${statusBadge}
+                    </div>
+
+                    <div class="text-3xl sm:text-4xl my-1 transform group-hover:scale-110 transition-transform duration-300">
+                        ${centerIcon}
+                    </div>
+
+                    <div class="text-[11px] sm:text-xs font-medium text-roseNoel-200/80 truncate w-full text-center">
+                        ${isOpened ? item.title : (unlocked ? 'Découvrir' : `${item.day} déc.`)}
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        // Gestion du clic sur une case
+        function handleDayClick(item) {
+            if (!isDayUnlocked(item.day)) {
+                showToast(`Patience mon cœur, cette surprise s'ouvrira le ${item.day} décembre ! ❤️`, "🔒");
+                return;
+            }
+
+            // Marquer comme ouverte et sauvegarder
+            if (!openedDays.includes(item.day)) {
+                openedDays.push(item.day);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(openedDays));
+                renderCalendar();
+                updateProgress();
+            }
+
+            openDayModal(item);
+        }
+
+        // Ouvre la modale avec le contenu interactif adapté au type
+        function openDayModal(item) {
+            const modal = document.getElementById('day-modal');
+            const badge = document.getElementById('modal-day-badge');
+            const emoji = document.getElementById('modal-emoji');
+            const title = document.getElementById('modal-title');
+            const body = document.getElementById('modal-body');
+
+            badge.textContent = item.day === 1 ? "1er Décembre" : `${item.day} Décembre`;
+            emoji.textContent = item.emoji;
+            title.textContent = item.title;
+            body.innerHTML = '';
+
+            if (item.type === 'message') {
+                renderMessageContent(body, item);
+            } else if (item.type === 'quiz') {
+                renderQuizContent(body, item);
+            } else if (item.type === 'coupon') {
+                renderCouponContent(body, item);
+            } else if (item.type === 'riddle') {
+                renderRiddleContent(body, item);
+            } else if (item.type === 'memory') {
+                renderMemoryContent(body, item);
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeDayModal() {
+            const modal = document.getElementById('day-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // Fermer la modale en cliquant à l'extérieur
+        document.getElementById('day-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'day-modal') closeDayModal();
+        });
+
+        /* --- RENDU DES DIFFÉRENTS TYPES DE SURPRISES --- */
+
+        // 1. Type MESSAGE
+        function renderMessageContent(container, item) {
+            const formattedText = item.text.replace(/\n/g, '<br>');
+            container.innerHTML = `
+                <div class="bg-white/80 rounded-2xl p-5 sm:p-6 border border-roseNoel-200 shadow-inner text-center">
+                    <p class="text-roseNoel-900 text-base sm:text-lg leading-relaxed font-medium">
+                        ${formattedText}
+                    </p>
+                </div>
+                <div class="mt-6 text-center">
+                    <button onclick="triggerHeartBurst(); closeDayModal();" class="w-full sm:w-auto px-6 py-3 rounded-2xl bg-gradient-to-r from-roseNoel-600 to-roseNoel-500 hover:from-roseNoel-700 hover:to-roseNoel-600 text-white font-bold shadow-lg shadow-roseNoel-500/30 transition transform active:scale-95 cursor-pointer">
+                        ${item.buttonText || "J'adore ❤️"}
+                    </button>
+                </div>
+            `;
+        }
+
+        // 2. Type QUIZ
+        function renderQuizContent(container, item) {
+            const optionsHtml = item.options.map((opt, idx) => `
+                <button type="button" onclick="checkQuizAnswer(this, ${idx}, ${item.correctIndex}, '${item.explanation.replace(/'/g, "\\'")}')" 
+                    class="quiz-opt-btn w-full text-left p-3.5 rounded-xl bg-white hover:bg-roseNoel-100/80 border-2 border-roseNoel-200 text-roseNoel-900 font-medium text-sm sm:text-base transition flex items-center justify-between gap-3 cursor-pointer">
+                    <span>${opt}</span>
+                    <span class="opt-status text-lg"></span>
+                </button>
+            `).join('');
+
+            container.innerHTML = `
+                <p class="text-center font-semibold text-roseNoel-800 mb-4 text-base sm:text-lg">${item.question}</p>
+                <div class="space-y-2.5" id="quiz-options">
+                    ${optionsHtml}
+                </div>
+                <div id="quiz-feedback" class="hidden mt-4 p-4 rounded-2xl bg-roseNoel-100 border border-roseNoel-300 text-roseNoel-900 text-sm font-medium text-center animate-pop">
+                </div>
+            `;
+        }
+
+        function checkQuizAnswer(btn, selectedIdx, correctIdx, explanation) {
+            const allBtns = document.querySelectorAll('.quiz-opt-btn');
+            const feedback = document.getElementById('quiz-feedback');
+
+            if (selectedIdx === correctIdx) {
+                allBtns.forEach((b, i) => {
+                    b.disabled = true;
+                    b.classList.remove('hover:bg-roseNoel-100/80');
+                    if (i === correctIdx) {
+                        b.classList.remove('border-roseNoel-200', 'bg-white');
+                        b.classList.add('border-emerald-500', 'bg-emerald-50', 'text-emerald-900');
+                        b.querySelector('.opt-status').textContent = '✅';
+                    }
+                });
+                feedback.innerHTML = `🎉 <strong>Bonne réponse !</strong><br><span class="mt-1 inline-block">${explanation}</span>`;
+                feedback.classList.remove('hidden');
+                triggerHeartBurst();
+            } else {
+                btn.classList.remove('border-roseNoel-200', 'bg-white');
+                btn.classList.add('border-roseNoel-500', 'bg-roseNoel-100');
+                btn.querySelector('.opt-status').textContent = '❌';
+                showToast("Presque ! Essaie une autre réponse mon cœur 😘", "💭");
+            }
+        }
+
+        // 3. Type COUPON (Bon cadeau)
+        function renderCouponContent(container, item) {
+            const isRedeemed = redeemedCoupons.includes(item.day);
+
+            container.innerHTML = `
+                <div class="relative bg-gradient-to-br from-roseNoel-600 via-roseNoel-700 to-roseNoel-900 text-white rounded-2xl p-6 border-2 border-dashed border-orDoux shadow-xl text-center overflow-hidden">
+                    <div class="text-xs uppercase tracking-widest text-orDoux font-bold mb-2">★ Bon Officiel d'Amour ★</div>
+                    <h3 class="text-xl sm:text-2xl font-extrabold tracking-tight mb-3 text-white">${item.couponTitle}</h3>
+                    <p class="text-sm text-roseNoel-100 leading-relaxed mb-4">${item.couponDesc}</p>
+                    <div class="inline-block px-3 py-1 rounded-full bg-black/25 text-xs text-orDoux font-medium">
+                        ${item.validity}
+                    </div>
+                </div>
+                <div class="mt-6 text-center">
+                    <button id="redeem-btn-${item.day}" onclick="redeemCoupon(${item.day})" 
+                        class="w-full py-3 px-6 rounded-2xl font-bold text-sm sm:text-base transition shadow-lg cursor-pointer ${isRedeemed ? 'bg-emerald-600 text-white' : 'bg-roseNoel-600 hover:bg-roseNoel-700 text-white'}">
+                        ${isRedeemed ? '✅ Bon enregistré ! Montre-le moi vite 😘' : '🎟️ Valider et garder mon bon'}
+                    </button>
+                </div>
+            `;
+        }
+
+        function redeemCoupon(day) {
+            if (!redeemedCoupons.includes(day)) {
+                redeemedCoupons.push(day);
+                localStorage.setItem(COUPONS_KEY, JSON.stringify(redeemedCoupons));
+            }
+            const btn = document.getElementById(`redeem-btn-${day}`);
+            if (btn) {
+                btn.textContent = '✅ Bon enregistré ! Montre-le moi vite 😘';
+                btn.classList.remove('bg-roseNoel-600', 'hover:bg-roseNoel-700');
+                btn.classList.add('bg-emerald-600');
+            }
+            triggerHeartBurst();
+            showToast("Ton bon est validé ! Fais une capture d'écran ou montre-le moi ❤️", "🎟️");
+        }
+
+        // 4. Type RIDDLE (Devinette)
+        function renderRiddleContent(container, item) {
+            container.innerHTML = `
+                <div class="bg-white/85 rounded-2xl p-5 border border-roseNoel-200 text-center">
+                    <p class="text-roseNoel-900 font-semibold text-base sm:text-lg leading-relaxed mb-3">
+                        « ${item.question} »
+                    </p>
+                    <p class="text-xs text-roseNoel-600 italic">💡 Indice : ${item.hint}</p>
+                </div>
+                <div id="riddle-answer-box" class="hidden mt-4 p-4 rounded-2xl bg-gradient-to-r from-roseNoel-100 to-amber-50 border border-orDoux text-center animate-pop">
+                    <p class="text-xs uppercase tracking-wider font-bold text-roseNoel-600 mb-1">Réponse :</p>
+                    <p class="text-roseNoel-950 font-bold text-base sm:text-lg">${item.answer}</p>
+                </div>
+                <div class="mt-5 text-center">
+                    <button id="reveal-riddle-btn" onclick="revealRiddle()" class="px-6 py-3 rounded-2xl bg-roseNoel-600 hover:bg-roseNoel-700 text-white font-bold text-sm sm:text-base shadow-md transition cursor-pointer">
+                        👀 Révéler la réponse
+                    </button>
+                </div>
+            `;
+        }
+
+        function revealRiddle() {
+            document.getElementById('riddle-answer-box').classList.remove('hidden');
+            document.getElementById('reveal-riddle-btn').classList.add('hidden');
+            triggerHeartBurst();
+        }
+
+        // 5. Type MEMORY (Mini-jeu interactif)
+        let memoryState = {
+            flipped: [],
+            matchedCount: 0,
+            moves: 0,
+            lockBoard: false
+        };
+
+        function renderMemoryContent(container, item) {
+            const deck = [...item.pairs, ...item.pairs].sort(() => Math.random() - 0.5);
+            memoryState = { flipped: [], matchedCount: 0, moves: 0, lockBoard: false };
+
+            const cardsHtml = deck.map((symbol, index) => `
+                <div class="memory-card aspect-square cursor-pointer" data-symbol="${symbol}" data-index="${index}" onclick="flipMemoryCard(this, ${item.pairs.length}, '${item.winMessage.replace(/'/g, "\\'")}')">
+                    <div class="memory-inner w-full h-full relative">
+                        <div class="memory-front absolute inset-0 rounded-xl bg-gradient-to-br from-roseNoel-500 to-roseNoel-700 border-2 border-orDoux/60 flex items-center justify-center text-white text-xl font-bold shadow-sm">
+                            ❤️
+                        </div>
+                        <div class="memory-back absolute inset-0 rounded-xl bg-white border-2 border-roseNoel-300 flex items-center justify-center text-2xl sm:text-3xl shadow-inner">
+                            ${symbol}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = `
+                <p class="text-center text-sm text-roseNoel-800 mb-3">${item.intro}</p>
+                <div class="flex justify-between items-center text-xs font-bold text-roseNoel-700 mb-2 px-1">
+                    <span>Paires : <span id="mem-pairs">0</span> / ${item.pairs.length}</span>
+                    <span>Coups : <span id="mem-moves">0</span></span>
+                </div>
+                <div class="grid grid-cols-4 gap-2 sm:gap-2.5 max-w-xs mx-auto">
+                    ${cardsHtml}
+                </div>
+                <div id="memory-win-box" class="hidden mt-4 p-4 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-950 text-center text-sm font-semibold animate-pop">
+                </div>
+            `;
+        }
+
+        function flipMemoryCard(cardEl, totalPairs, winMessage) {
+            if (memoryState.lockBoard) return;
+            if (cardEl.classList.contains('memory-flipped') || cardEl.classList.contains('memory-matched')) return;
+
+            cardEl.classList.add('memory-flipped');
+            memoryState.flipped.push(cardEl);
+
+            if (memoryState.flipped.length === 2) {
+                memoryState.moves++;
+                document.getElementById('mem-moves').textContent = memoryState.moves;
+                memoryState.lockBoard = true;
+
+                const [card1, card2] = memoryState.flipped;
+                const isMatch = card1.dataset.symbol === card2.dataset.symbol;
+
+                if (isMatch) {
+                    card1.classList.add('memory-matched');
+                    card2.classList.add('memory-matched');
+                    memoryState.matchedCount++;
+                    document.getElementById('mem-pairs').textContent = memoryState.matchedCount;
+                    memoryState.flipped = [];
+                    memoryState.lockBoard = false;
+
+                    if (memoryState.matchedCount === totalPairs) {
+                        const winBox = document.getElementById('memory-win-box');
+                        winBox.innerHTML = `🎉 <strong>Gagné en ${memoryState.moves} coups !</strong><br><span class="mt-1 inline-block font-normal">${winMessage}</span>`;
+                        winBox.classList.remove('hidden');
+                        triggerHeartBurst();
+                    }
+                } else {
+                    setTimeout(() => {
+                        card1.classList.remove('memory-flipped');
+                        card2.classList.remove('memory-flipped');
+                        memoryState.flipped = [];
+                        memoryState.lockBoard = false;
+                    }, 750);
+                }
+            }
+        }
+
+        /* --- OUTILS UI : PROGRESSION, MODE APERÇU, TOAST & PARTICULES --- */
+
+        function updateProgress() {
+            const count = openedDays.length;
+            const percentage = Math.round((count / 24) * 100);
+            document.getElementById('progress-text').textContent = `${count} / 24`;
+            document.getElementById('progress-bar').style.width = `${percentage}%`;
+        }
+
+        function togglePreviewMode() {
+            previewMode = !previewMode;
+            const banner = document.getElementById('preview-banner');
+            const btn = document.getElementById('preview-toggle-btn');
+
+            if (previewMode) {
+                banner.classList.remove('hidden');
+                btn.textContent = '🔒 Revenir au verrouillage par date';
+                showToast("Mode Aperçu activé : tu peux tester toutes les cases !", "🔓");
+            } else {
+                banner.classList.add('hidden');
+                btn.textContent = '🔓 Mode Aperçu (Tout débloquer)';
+                showToast("Verrouillage automatique par date réactivé.", "🔒");
+            }
+            renderCalendar();
+        }
+
+        function askResetProgress() {
+            const modal = document.getElementById('confirm-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeConfirmModal() {
+            const modal = document.getElementById('confirm-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function confirmResetProgress() {
+            openedDays = [];
+            redeemedCoupons = [];
+            localStorage.removeItem(STORAGE_KEY);
+            localStorage.removeItem(COUPONS_KEY);
+            closeConfirmModal();
+            renderCalendar();
+            updateProgress();
+            showToast("Toutes les cases ont été refermées !", "✨");
+        }
+
+        let toastTimeout;
+        function showToast(message, icon = "💌") {
+            const toast = document.getElementById('toast-notification');
+            document.getElementById('toast-message').textContent = message;
+            document.getElementById('toast-icon').textContent = icon;
+
+            toast.classList.remove('opacity-0', 'translate-y-4');
+            toast.classList.add('opacity-100', 'translate-y-0');
+
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-4');
+                toast.classList.remove('opacity-100', 'translate-y-0');
+            }, 3500);
+        }
+
+        // Animation de pluie de cœurs/flocons en arrière-plan + explosion de cœurs au clic
+        let burstParticles = [];
+
+        function triggerHeartBurst() {
+            const symbols = ['❤️', '💖', '✨', '🎄', '🥰'];
+            for (let i = 0; i < 28; i++) {
+                burstParticles.push({
+                    x: window.innerWidth / 2,
+                    y: window.innerHeight / 2,
+                    vx: (Math.random() - 0.5) * 14,
+                    vy: (Math.random() - 0.7) * 14,
+                    size: 16 + Math.random() * 14,
+                    alpha: 1,
+                    symbol: symbols[Math.floor(Math.random() * symbols.length)]
+                });
+            }
+        }
+
+        function initParticles() {
+            const canvas = document.getElementById('particles-canvas');
+            const ctx = canvas.getContext('2d');
+            let width = canvas.width = window.innerWidth;
+            let height = canvas.height = window.innerHeight;
+
+            window.addEventListener('resize', () => {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            });
+
+            // Flocons doux et petits cœurs flottants
+            const particles = Array.from({ length: 45 }, () => ({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                r: Math.random() * 3 + 1.5,
+                speedY: Math.random() * 0.8 + 0.3,
+                speedX: (Math.random() - 0.5) * 0.4,
+                isHeart: Math.random() > 0.75,
+                opacity: Math.random() * 0.5 + 0.2
+            }));
+
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+
+                // Particules d'ambiance
+                particles.forEach(p => {
+                    p.y += p.speedY;
+                    p.x += p.speedX;
+
+                    if (p.y > height) {
+                        p.y = -10;
+                        p.x = Math.random() * width;
+                    }
+                    if (p.x > width) p.x = 0;
+                    if (p.x < 0) p.x = width;
+
+                    ctx.save();
+                    ctx.globalAlpha = p.opacity;
+                    if (p.isHeart) {
+                        ctx.font = `${p.r * 4}px serif`;
+                        ctx.fillStyle = '#fda4b4';
+                        ctx.fillText('♥', p.x, p.y);
+                    } else {
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                        ctx.fillStyle = '#fff1f3';
+                        ctx.fill();
+                    }
+                    ctx.restore();
+                });
+
+                // Particules d'explosion (quand elle gagne ou valide un mot doux)
+                for (let i = burstParticles.length - 1; i >= 0; i--) {
+                    const bp = burstParticles[i];
+                    bp.x += bp.vx;
+                    bp.y += bp.vy;
+                    bp.vy += 0.35; // gravité légère
+                    bp.alpha -= 0.018;
+
+                    if (bp.alpha <= 0) {
+                        burstParticles.splice(i, 1);
+                        continue;
+                    }
+
+                    ctx.save();
+                    ctx.globalAlpha = bp.alpha;
+                    ctx.font = `${bp.size}px serif`;
+                    ctx.fillText(bp.symbol, bp.x, bp.y);
+                    ctx.restore();
+                }
+
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+        }
+    </script>
+</body>
+</html>
